@@ -35,3 +35,105 @@
 We use a **MAX30100 / Pulse Sensor** to bring real physiological data into the AI experience.
 
 <img src="yoga-ai-web/public/sensor_demo.png" alt="Heart Rate Sensor" width="300" style="border-radius: 10px; border: 2px solid #ff0000; margin: 10px 0;">
+
+**How it Works (PPG Principle):**
+1.  **Photoplethysmography:** The sensor detects changes in blood flow volume in the microvascular bed of tissue.
+2.  **Light Intensity:** As your heart beats, blood flow changes, altering the intensity of reflected light.
+3.  **Signal Conversion:** This optical variation is converted into an electrical signal.
+4.  **Real-time Analysis:** The system calculates your **Heart Rate (BPM)** and **SpO2** instantly.
+
+**Why we use it:**
+- ❤️ **Real-time Biofeedback:** Directly links your physical state to the digital Yoga experience.
+- 🧘 **Meditation Validation:** Verifies calmness through lowered heart rate variability.
+
+**Common Applications:**
+- ❤️ Heartbeat / Pulse detection
+- 🧘 Yoga & Meditation biofeedback systems
+- 🤖 Arduino / ESP32 health monitoring projects
+- 📊 Stress and Fitness tracking demos
+
+
+
+---
+
+## 🛠️ Tech Stack
+
+- **Framework**: [Next.js 14+](https://nextjs.org/) (App Router)
+- **Language**: TypeScript
+- **AI/ML**: [MediaPipe](https://developers.google.com/mediapipe) (Vision Tasks)
+- **Styling**: Tailwind CSS
+- **State Management**: React Hooks (useContext, useReducer)
+- **Visuals**: HTML5 Canvas, Framer Motion
+
+---
+
+## 🚀 Getting Started
+
+1.  **Clone the repository**:
+    ```bash
+    git clone https://github.com/adityaIITG1/YOGA-AI-IITH-HACATHON.git
+    cd yoga-ai-web
+    ```
+
+2.  **Install dependencies**:
+    ```bash
+    npm install
+    # or
+    yarn install
+    ```
+
+3.  **Run the development server**:
+    ```bash
+    npm run dev
+    ```
+
+
+4.  **Open [http://localhost:3000](http://localhost:3000)** to start your yoga session!
+
+### 🌍 Deployment (Vercel)
+Want to share this with the world? Deploying to Vercel is instant:
+
+1.  Push this repository to **GitHub**.
+2.  Go to [Vercel.com](https://vercel.com) and log in.
+3.  Click **"Add New..."** -> **"Project"**.
+4.  Import your `YOGA-AI-IITH-HACATHON` repository.
+5.  **Critical Setting:** In "Framework Preset", select **Next.js**.
+    - **Root Directory:** Edit this and select `yoga-ai-web`. (This is crucial as the web app lives in this subfolder).
+6.  Click **Deploy**.
+7.  Done! Your Yoga AI is live on the web.
+
+### 🐍 Other Option: Run Native Python App (`yogi.py`)
+If you encounter issues with the web version or want direct hardware sensor access:
+
+#### Prerequisites
+- **Python 3.8+** installed.
+- Install required libraries:
+  ```bash
+  pip install opencv-python mediapipe numpy pygame SpeechRecognition pyttsx3 pyserial pyaudio
+  ```
+
+#### Steps
+1.  Open the project folder in **VS Code**.
+
+2.  Open the file `yogi.py`.
+3.  Click the **▷ Run Button** (Play icon) in the top right corner.
+
+> **Note for Judges:** 
+> Please also check our **Live Deployment** at [https://yogaii.vercel.app/](https://yogaii.vercel.app/) for the smoothest experience if you don't have the Python environment set up. It offers the same core AI features directly in the browser!
+
+
+
+---
+
+## 📸 Screenshots
+
+<img src="yoga-ai-web/public/yogi_demo_v2.png" alt="Yoga AI Demo" width="100%" style="border-radius: 10px; border: 2px solid #00ff00;">
+
+
+## 🎥 Video Demonstration
+
+Watch the project in action:
+
+- **YouTube Short**: [Watch Demo](https://youtube.com/shorts/F-6WMswfo4M?si=3ZmhGJcTlJCQPOqC)
+- **LinkedIn Post**: [View Project & Insights](https://www.linkedin.com/posts/aditya-kumar-singh-39245525b_iitguwahati-yogaai-artificialintelligence-activity-7402318177742807040-IJYa)
+
