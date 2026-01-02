@@ -1,4 +1,4 @@
-import YogaCanvas from "@/components/YogaCanvas";
+import YogaCanvas from "../components/YogaCanvas";
 
 export default function Home() {
   return (

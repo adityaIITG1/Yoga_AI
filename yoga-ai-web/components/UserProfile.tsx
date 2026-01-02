@@ -9,7 +9,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { User, LogOut, TrendingUp, Award, Calendar } from "lucide-react";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "../hooks/useAuth";
 
 interface UserProfileProps {
     onOpenProgress?: () => void;

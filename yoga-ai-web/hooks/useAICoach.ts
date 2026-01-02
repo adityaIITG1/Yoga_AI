@@ -6,7 +6,7 @@
  */
 
 import { useState, useCallback, useRef } from 'react';
-import { getAIGuidance, type AIContext, type AIResponse } from '@/utils/ai-coach';
+import { getAIGuidance, type AIContext, type AIResponse } from '../utils/ai-coach';
 
 export function useAICoach() {
     const [isLoading, setIsLoading] = useState(false);

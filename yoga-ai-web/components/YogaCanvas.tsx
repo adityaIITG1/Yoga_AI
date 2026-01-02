@@ -1,24 +1,24 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useVisionModels } from "@/hooks/useVisionModels";
-import { useVoiceAssistant } from "@/hooks/useVoiceAssistant";
-import { useArduino } from "@/hooks/useArduino";
-import { useYogaAgent } from "@/hooks/useYogaAgent";
-import { useAICoach } from "@/hooks/useAICoach";
-import { useAuth } from "@/hooks/useAuth";
-import { useSessionTracking } from "@/hooks/useSessionTracking";
+import { useVisionModels } from "../hooks/useVisionModels";
+import { useVoiceAssistant } from "../hooks/useVoiceAssistant";
+import { useArduino } from "../hooks/useArduino";
+import { useYogaAgent } from "../hooks/useYogaAgent";
+import { useAICoach } from "../hooks/useAICoach";
+import { useAuth } from "../hooks/useAuth";
+import { useSessionTracking } from "../hooks/useSessionTracking";
 import {
     classifyGesture,
     detectNamaste,
-} from "@/utils/gesture-recognition";
-import { analyzeFace } from "@/utils/face-logic";
+} from "../utils/gesture-recognition";
+import { analyzeFace } from "../utils/face-logic";
 import {
     drawUniverse,
     drawChakras,
     drawSmartTracking,
-} from "@/utils/drawing";
-import { generateSmartCoachMessage } from "@/utils/smart-coach";
+} from "../utils/drawing";
+import { generateSmartCoachMessage } from "../utils/smart-coach";
 import html2canvas from "html2canvas";
 
 import TopBar from "./TopBar";

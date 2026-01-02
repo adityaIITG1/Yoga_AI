@@ -8,8 +8,8 @@
 
 import { useState, useRef, useCallback } from 'react';
 import { Timestamp } from 'firebase/firestore';
-import { saveSession, type YogaSession } from '@/lib/firestore';
-import type { SessionPhase } from '@/utils/yoga-agent';
+import { saveSession, type YogaSession } from '../lib/firestore';
+import type { SessionPhase } from '../utils/yoga-agent';
 
 interface SessionData {
     mudrasPerformed: Set<string>;

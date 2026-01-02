@@ -10,7 +10,7 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, Brain, Heart, Zap } from "lucide-react";
-import type { SessionPhase } from "@/utils/yoga-agent";
+import type { SessionPhase } from "../utils/yoga-agent";
 
 interface AICoachPanelProps {
     guidance: string | null;

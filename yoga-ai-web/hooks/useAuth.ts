@@ -8,14 +8,15 @@
 
 import { useState, useEffect } from 'react';
 import { User } from 'firebase/auth';
+import { Timestamp } from 'firebase/firestore';
 import {
     signInWithGoogle,
     signInWithEmail,
     signUpWithEmail,
     signOut as authSignOut,
     onAuthChange,
-} from '@/lib/auth';
-import { getUserProfile, type UserProfile } from '@/lib/firestore';
+} from '../lib/auth';
+import { getUserProfile, type UserProfile } from '../lib/firestore';
 
 export function useAuth() {
     const [user, setUser] = useState<User | null>(null);
@@ -41,7 +42,7 @@ export function useAuth() {
                         name: authUser.displayName || 'Yogi',
                         email: authUser.email || '',
                         photoURL: authUser.photoURL || undefined,
-                        createdAt: new Date(),
+                        createdAt: Timestamp.fromDate(new Date()),
                         preferences: {
                             favoriteMudras: [],
                             sessionGoal: 20,

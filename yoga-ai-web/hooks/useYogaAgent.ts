@@ -6,7 +6,7 @@
  */
 
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { YogaAgent, type SessionPhase, type GuidanceAction } from '@/utils/yoga-agent';
+import { YogaAgent, type SessionPhase, type GuidanceAction } from '../utils/yoga-agent';
 
 export function useYogaAgent() {
     const agentRef = useRef<YogaAgent | null>(null);
