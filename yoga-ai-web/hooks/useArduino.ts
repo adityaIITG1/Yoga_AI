@@ -28,6 +28,7 @@ export function useArduino() {
     });
 
     const [error, setError] = useState<string | null>(null);
+    const [demoMode, setDemoMode] = useState(false); // NEW: Demo mode toggle
     const portRef = useRef<SerialPort | null>(null);
     const readerRef = useRef<ReadableStreamDefaultReader<string> | null>(null);
     const isReadingRef = useRef(false);
@@ -36,6 +37,62 @@ export function useArduino() {
     const ibiHistoryRef = useRef<number[]>([]);
     const lastInsightTimeRef = useRef<number>(0);
     const lastHeartRateRef = useRef<number>(0);
+
+    // NEW: Demo Data Simulation
+    useEffect(() => {
+        if (!demoMode) return;
+
+        const interval = setInterval(() => {
+            const now = Date.now();
+            const t = now / 1000;
+
+            // Simulate realistic heart rate (65-85 BPM with breathing variation)
+            const baseHR = 75;
+            const breathVariation = Math.sin(t * 0.3) * 5; // Breathing cycle
+            const randomNoise = (Math.random() - 0.5) * 2;
+            const simulatedHR = Math.round(baseHR + breathVariation + randomNoise);
+
+            // Simulate SpO2 (97-99%)
+            const simulatedSpO2 = Math.round(98 + Math.sin(t * 0.5) * 1);
+
+            // Simulate beat detection (periodic based on HR)
+            const beatInterval = 60000 / simulatedHR;
+            const shouldBeat = now - lastBeatTimeRef.current > beatInterval;
+            if (shouldBeat) {
+                lastBeatTimeRef.current = now;
+            }
+
+            // Simulate HRV (30-70 ms)
+            const simulatedHRV = Math.round(50 + Math.sin(t * 0.2) * 20);
+
+            // Simulate Doshas (slowly changing)
+            const vata = 0.3 + Math.sin(t * 0.1) * 0.15;
+            const pitta = 0.35 + Math.cos(t * 0.15) * 0.1;
+            const kapha = 1 - vata - pitta;
+
+            // Rotate insights
+            const insights = [
+                { text: "Breathing is syncing with heart rate.", finding: "Tridosha Balanced" },
+                { text: "Deep state of relaxation detected.", finding: "Dominant: Kapha (Stability)" },
+                { text: "Heart rhythm is steady and calm.", finding: "Tridosha Balanced" },
+                { text: "Excellent physiological coherence.", finding: "Dominant: Vata (High Movement)" }
+            ];
+            const insightIndex = Math.floor(t / 15) % insights.length;
+
+            setData({
+                heartRate: simulatedHR,
+                spo2: simulatedSpO2,
+                beatDetected: shouldBeat,
+                isConnected: true,
+                hrvIndex: simulatedHRV,
+                doshas: { vata, pitta, kapha },
+                insightText: insights[insightIndex].text,
+                finding: insights[insightIndex].finding
+            });
+        }, 100); // Update 10 times per second
+
+        return () => clearInterval(interval);
+    }, [demoMode]);
 
     // Data Timeout & Reset Logic
     useEffect(() => {
@@ -111,12 +168,16 @@ export function useArduino() {
     const hrBufferRef = useRef<number[]>([]);
 
     const parseLine = useCallback((line: string) => {
-        // Expected format: "BPM:75,SpO2:98" or similar
+        // Expected formats: 
+        // "BPM:75,SpO2:98" (original)
+        // "HR:75;SpO2:98;" (alternative with semicolons)
         if (!line) return;
 
-        const parts = line.split(',');
+        // Handle both comma and semicolon separators
+        const parts = line.split(/[,;]/).filter(p => p.trim());
         let newHr: number | null = null;
         let newSpo2: number | null = null;
+        let newIbi: number | null = null;
         let beat = false;
 
         parts.forEach(part => {
@@ -129,6 +190,8 @@ export function useArduino() {
                 newHr = val;
             } else if (key.includes('SpO2') || key.includes('O2')) {
                 newSpo2 = val;
+            } else if (key.includes('IBI')) {
+                newIbi = val;
             } else if (key.includes('BEAT')) {
                 beat = val > 0;
             }
@@ -139,12 +202,16 @@ export function useArduino() {
             lastDataTimeRef.current = Date.now();
             const now = Date.now();
 
-            // Beat simulation if not explicit
-            if (newHr !== null && newHr > 0) {
+            if (newIbi && newIbi > 0) {
+                ibiHistoryRef.current.push(newIbi);
+                if (ibiHistoryRef.current.length > 30) ibiHistoryRef.current.shift();
+                beat = true;
+            } else if (newHr !== null && newHr > 0) {
+                // SOFTWARE FALLBACK if hardware IBI is missing
                 const beatInterval = 60000 / newHr;
                 if (now - lastBeatTimeRef.current > beatInterval) {
                     beat = true;
-                    // Calculate IBI
+                    // Calculate IBI from local time
                     const ibi = now - lastBeatTimeRef.current;
                     if (ibi > 300 && ibi < 1500) { // Valid IBI
                         ibiHistoryRef.current.push(ibi);
@@ -185,17 +252,12 @@ export function useArduino() {
 
             lastHeartRateRef.current = smoothedHr;
 
-            // SpO2 OVERRIDE LOGIC (User Request: 97-100% when HR active)
+            // Use actual SpO2 from sensor (if available)
             let finalSpo2 = 0;
-            if (smoothedHr > 0) {
-                // Map HR stability to SpO2 or just random high value
-                // Using a pseudo-random based on time to look natural but stay high
-                const noise = Math.sin(Date.now() / 1000) * 1.5;
-                finalSpo2 = Math.min(100, Math.max(97, 98 + noise));
-                finalSpo2 = Math.round(finalSpo2);
-            } else {
-                finalSpo2 = 0;
+            if (newSpo2 !== null) {
+                finalSpo2 = newSpo2;
             }
+
 
             // Generate Insight
             const newInsights = generateInsight(smoothedHr, hrv, doshas);
@@ -260,7 +322,8 @@ export function useArduino() {
     const connect = useCallback(async () => {
         setError(null);
         if (!("serial" in navigator)) {
-            setError("Web Serial API not supported in this browser.");
+            setError("Web Serial API not supported. Enabling demo mode...");
+            setDemoMode(true); // Enable demo mode as fallback
             return;
         }
 
@@ -270,6 +333,7 @@ export function useArduino() {
             portRef.current = port;
 
             setData(prev => ({ ...prev, isConnected: true }));
+            setDemoMode(false); // Disable demo mode when real sensor connects
 
             const textDecoder = new TextDecoderStream();
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -283,8 +347,11 @@ export function useArduino() {
             console.error("Error connecting to Arduino:", err);
             const msg = err instanceof Error ? err.message : String(err);
 
-            // Ignore "No port selected" error (User cancelled)
-            if (!msg.includes("No port selected")) {
+            // If user cancelled or no port selected, enable demo mode
+            if (msg.includes("No port selected") || msg.includes("cancelled")) {
+                setError("No sensor selected. Enabling demo mode...");
+                setDemoMode(true);
+            } else {
                 setError(msg);
             }
 
@@ -296,6 +363,9 @@ export function useArduino() {
         arduinoData: data,
         connectArduino: connect,
         disconnectArduino: disconnect,
-        arduinoError: error
+        arduinoError: error,
+        enableDemoMode: () => setDemoMode(true),
+        disableDemoMode: () => setDemoMode(false),
+        isDemoMode: demoMode
     };
 }

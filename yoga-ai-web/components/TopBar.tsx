@@ -1,5 +1,6 @@
 import React from "react";
 import { Activity, Brain, Zap, User, Sparkles } from "lucide-react";
+import UserProfile from "./UserProfile";
 
 interface TopBarProps {
     sessionTime: string;
@@ -8,6 +9,7 @@ interface TopBarProps {
     alignmentMode?: string;
     isSensorConnected?: boolean;
     connectSensor?: () => void;
+    showUserProfile?: boolean;
 }
 
 export default function TopBar({
@@ -16,7 +18,8 @@ export default function TopBar({
     posture = "Good",
     alignmentMode = "Standard",
     isSensorConnected = false,
-    connectSensor
+    connectSensor,
+    showUserProfile = true
 }: TopBarProps) {
     return (
         <div className="absolute top-4 left-0 w-full z-30 flex justify-center pointer-events-none">
@@ -109,6 +112,16 @@ export default function TopBar({
                         </span>
                     </div>
                 </button>
+
+                {/* User Profile */}
+                {showUserProfile && (
+                    <>
+                        <div className="w-px h-4 bg-white/10"></div>
+                        <div className="pointer-events-auto">
+                            <UserProfile />
+                        </div>
+                    </>
+                )}
             </div>
         </div>
     );

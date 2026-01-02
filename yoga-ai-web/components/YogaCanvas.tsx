@@ -4,6 +4,10 @@ import { useEffect, useRef, useState } from "react";
 import { useVisionModels } from "@/hooks/useVisionModels";
 import { useVoiceAssistant } from "@/hooks/useVoiceAssistant";
 import { useArduino } from "@/hooks/useArduino";
+import { useYogaAgent } from "@/hooks/useYogaAgent";
+import { useAICoach } from "@/hooks/useAICoach";
+import { useAuth } from "@/hooks/useAuth";
+import { useSessionTracking } from "@/hooks/useSessionTracking";
 import {
     classifyGesture,
     detectNamaste,
@@ -22,6 +26,9 @@ import RightSidebar from "./RightSidebar";
 import LeftSidebar from "./LeftSidebar";
 import BottomOverlay from "./BottomOverlay";
 import BioAnalyticsPanel from "./BioAnalyticsPanel";
+import AICoachPanel from "./AICoachPanel";
+import AuthModal from "./AuthModal";
+import UserProfile from "./UserProfile";
 
 export default function YogaCanvas() {
     const videoRef = useRef<HTMLVideoElement>(null);
@@ -30,6 +37,18 @@ export default function YogaCanvas() {
     const { handLandmarker, faceLandmarker, isLoading, error: aiError } = useVisionModels();
     const { isListening, isSpeaking, toggleListening } = useVoiceAssistant();
     const { arduinoData, connectArduino, arduinoError } = useArduino();
+
+    // Firebase Authentication
+    const { user, profile, loading: authLoading } = useAuth();
+    const [showAuthModal, setShowAuthModal] = useState(true); // Show by default
+
+    // Session Tracking
+    const { isTracking, startSession, updateSession, endSession } = useSessionTracking(user?.uid || null);
+
+    // AI Agent Integration
+    const { updateAgentState, requestGuidance, sessionPhase, sessionDuration } = useYogaAgent();
+    const { getGuidance, isLoading: isAIThinking, lastResponse } = useAICoach();
+    const [aiGuidance, setAiGuidance] = useState<string | null>(null);
 
     // Ref to track isSpeaking without triggering re-renders in the animation loop
     const isSpeakingRef = useRef(isSpeaking);
@@ -209,6 +228,13 @@ export default function YogaCanvas() {
             audioRef.current = null;
         };
     }, []);
+
+    // Auto-hide auth modal when user is authenticated
+    useEffect(() => {
+        if (user && !authLoading) {
+            setShowAuthModal(false);
+        }
+    }, [user, authLoading]);
 
     const toggleAudio = () => {
         if (!audioRef.current) return;
@@ -657,6 +683,43 @@ export default function YogaCanvas() {
                     pendingGestureStartTimeRef.current = 0;
                 }
 
+                // --- AI AGENT UPDATE ---
+                // Update agent state with current data
+                const avgEnergy = energiesRef.current.reduce((a, b) => a + b, 0) / 7 * 100;
+                updateAgentState({
+                    pose: gestureRef.current,
+                    mudra: currentGesture,
+                    heartRate: arduinoData.heartRate,
+                    isMeditating: isMeditationRef.current,
+                    energyLevel: avgEnergy
+                });
+
+                // Request guidance from agent (throttled internally)
+                const guidanceAction = requestGuidance();
+                if (guidanceAction) {
+                    if (guidanceAction.metadata.source === "gemini") {
+                        // Call Gemini API for wisdom
+                        getGuidance({
+                            mudra: guidanceAction.metadata.mudra,
+                            pose: gestureRef.current || undefined,
+                            heartRate: arduinoData.heartRate || undefined,
+                            energyLevel: avgEnergy,
+                            sessionPhase: sessionPhase,
+                            isMeditating: isMeditationRef.current
+                        }).then(response => {
+                            if (response && response.guidance) {
+                                setAiGuidance(response.guidance);
+                                speak(response.guidance);
+                            }
+                        });
+                    } else {
+                        // Use agent's built-in message
+                        setAiGuidance(guidanceAction.text);
+                        speak(guidanceAction.text);
+                    }
+                }
+
+
                 if (isMeditationRef.current && gestureRef.current !== "Meditation") {
                     // Trigger speech for meditation start
                     gestureRef.current = "Meditation";
@@ -804,8 +867,8 @@ export default function YogaCanvas() {
                 if (Math.floor(t * 30) % 10 === 0) {
                     setUiEnergies([...energies]);
 
-                    // Update Session Time
-                    const elapsedMin = (Date.now() - startTimeRef.current) / 60000;
+                    // Update Session Time (use value from useYogaAgent hook)
+                    const elapsedMin = sessionDuration / 60; // sessionDuration is in seconds
                     setSessionTime(`${elapsedMin.toFixed(1)} min`);
 
                     // Update Mood & Posture
@@ -1110,6 +1173,23 @@ export default function YogaCanvas() {
                     </button>
                 </div>
             </div>
+
+            {/* AI Coach Panel */}
+            <AICoachPanel
+                guidance={aiGuidance}
+                sessionPhase={sessionPhase}
+                isThinking={isAIThinking}
+                heartRate={arduinoData.heartRate}
+                energyLevel={uiEnergies.reduce((a, b) => a + b, 0) / 7 * 100}
+            />
+
+            {/* Auth Modal - Show for non-authenticated users */}
+            {showAuthModal && (
+                <AuthModal
+                    isOpen={showAuthModal}
+                    onClose={() => setShowAuthModal(false)}
+                />
+            )}
 
             {/* Global Overlays (Screenshot Flash) */}
             {screenshotFlash && (

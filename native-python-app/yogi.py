@@ -720,18 +720,20 @@ def draw_chakras(frame, center_x, top_y, bottom_y,
         wobble = 8 * math.sin(t * 1.4 + i * 0.9)
         cy = int(ys[i] + wobble)
 
-        base_radius = 18 + int(energy * 22)
+        base_radius = 14 + int(energy * 20) # [FIX] Intermediate size (User requested "slightly bigger")
         
         radius = int(base_radius * breath_factor * music_pulse)
 
         center = (center_x, cy)
 
-        aura_radius = int(radius * (1.5 + 0.3 * music_pulse))
-        aura_alpha = min(0.9, 0.25 + 0.5 * energy * music_pulse)
+        # [FIX] Glow only if Energy > 60%
+        if energy > 0.6:
+            aura_radius = int(radius * (1.5 + 0.3 * music_pulse))
+            aura_alpha = min(0.9, 0.25 + 0.5 * energy * music_pulse)
 
-        overlay = frame.copy()
-        cv2.circle(overlay, center, aura_radius, aura_color, -1)
-        cv2.addWeighted(overlay, aura_alpha, frame, 1 - aura_alpha, 0, frame)
+            overlay = frame.copy()
+            cv2.circle(overlay, center, aura_radius, aura_color, -1)
+            cv2.addWeighted(overlay, aura_alpha, frame, 1 - aura_alpha, 0, frame)
 
         cv2.circle(frame, center, radius, base_color, -1)
 
@@ -2920,9 +2922,9 @@ def draw_heart_rate_panel(frame, hr_monitor, meditation_stage, posture_score=0.0
     h, w, _ = frame.shape
     
     # Premium Compact Panel
-    panel_w = 280
-    panel_h = 520 
-    panel_x = 140 
+    panel_w = 300
+    panel_h = 630
+    panel_x = 120 # [FIX] Shifted left
     panel_y = 20
     
     is_simulated = False
@@ -2980,7 +2982,7 @@ def draw_heart_rate_panel(frame, hr_monitor, meditation_stage, posture_score=0.0
 
     # Graphs - COMPACT MODE
     gy = panel_y + 130 
-    gh = 30 
+    gh = 45 # [FIX] Increased height (was 30) for better visibility
     gap = 4
     
     # 1. Heart Rhythm (Red) -> ECG Style
@@ -3083,8 +3085,8 @@ def draw_heart_rate_panel(frame, hr_monitor, meditation_stage, posture_score=0.0
     # [NEW] Data Analysis Bot
     # Position relative to Coherence Graph to ensure visibility
     # [FIX] Position relative to Coherence Graph (y ~680)
-    bot_y = coherence_y + 65 # [FIX] Adjusted spacing to fit screen
-    bot_x = panel_x + 50 # Moved right slightly
+    bot_y = panel_y + panel_h - 40 # [FIX] Anchored to Bottom
+    bot_x = panel_x + panel_w // 2 # [FIX] Centered in Panel
     
     # Draw Bot Icon (Animated)
     t = time.time()
@@ -3409,7 +3411,7 @@ def draw_meditation_info_panel(frame, is_meditating, is_eyes_closed, energy_leve
     # Panel starts at x=140. Width 350. Right side ~320.
     # Moved to align with Heart Rate stats
     # [FIX] Moved further RIGHT to avoid touching SpO2 text (was 320)
-    x = 360
+    x = 280 # [FIX] Moved Left slightly to fit inside box
     y = 85 # [FIX] Aligned with HR (was 100)
     
     # Compact Text
@@ -3615,7 +3617,7 @@ def generate_aura_photo(frame, aura_color, avg_hr, focus_level):
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
     filename = os.path.join(screenshot_dir, f"yoga_session_{timestamp}.png")
     cv2.imwrite(filename, souvenir)
-    print(f"[INFO] 📸 Screenshot saved: {filename}")
+    print(f"[INFO] Screenshot saved: {filename}")
     
     return filename  # Return filename for confirmation
 
@@ -4532,7 +4534,7 @@ def main():
                     filename = generate_aura_photo(frame, aura_color, hr_monitor.heart_rate, avg_energy)
                     
                     namaste_triggered = True
-                    print(f"[INFO] 🙏 Namaste Screenshot Captured! Saved to: {filename}")
+                    print(f"[INFO] Namaste Screenshot Captured! Saved to: {filename}")
                     
                     # Visual Flash Effect
                     flash = frame.copy()

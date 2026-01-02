@@ -11,32 +11,13 @@ __pycache__/
 venv/
 .env
 
-# Legacy Project Files (Ignored for Repo Cleanup)
-# Legacy Project Files (Ignored for Repo Cleanup)
-# Old Backend Scripts
-
-# Old Web Project (Portfolio)
-/portfolio-web/
+# Media and Datasets
+screenshots/
+dataset/
 /Round2_Submission/
 /Submission/
 /predictions/
 /runs/
-/dataset/
-
-# Root Config Files (Tracked)
-!/package.json
-!/package-lock.json
-!/tsconfig.json
-!/next.config.ts
-!/postcss.config.mjs
-!/eslint.config.mjs
-!/next-env.d.ts
-!/app/
-!/components/
-!/hooks/
-!/public/
-!/utils/
-!/types/
 
 # Explicitly allow yoga-ai-web (redundant but safe)
 !yoga-ai-web/

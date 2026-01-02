@@ -321,10 +321,18 @@ export default function BioAnalyticsPanel({
             const graphW = panelW - 30;
             const graphX = 15;
 
-            drawGraph("HEART RHYTHM", pulseDataRef.current, graphX, startY, graphW, graphH, 'rgb(0, 0, 255)', 'line');
+            // 1. Heart Rate Graph (Smooth Line with Zone Colors)
+            let hrColor = 'rgb(34, 197, 94)'; // Rest (Green)
+            if (heartRateRef.current > 140) hrColor = 'rgb(239, 68, 68)'; // Peak (Red)
+            else if (heartRateRef.current > 100) hrColor = 'rgb(249, 115, 22)'; // Fat Burn (Orange)
 
-            const stressStatus = hrvDataRef.current[hrvDataRef.current.length - 1] < 0.3 ? "Relaxed" : "High";
-            drawGraph(`Stress: ${stressStatus}`, hrvDataRef.current, graphX, startY + graphH + gap, graphW, graphH, 'rgb(255, 0, 255)', 'bars');
+            drawGraph("HEART RATE (BPM)", pulseDataRef.current, graphX, startY, graphW, graphH, hrColor, 'line');
+
+            // 2. Stress Graph (Area Chart - Nadi Pariksha)
+            // Using HRV-derived stress: 0 (Relaxed) to 100 (Tense)
+            const stressVal = hrvDataRef.current[hrvDataRef.current.length - 1];
+            const stressStatus = stressVal < 30 ? "Relaxed" : stressVal < 70 ? "Balanced" : "High";
+            drawGraph(`STRESS (HRV): ${stressStatus}`, hrvDataRef.current.map(v => v / 100), graphX, startY + graphH + gap, graphW, graphH, 'rgb(168, 85, 247)', 'area');
 
             const pranaStatus = energyLevelRef.current > 0.6 ? "High" : "Building";
             drawGraph(`Prana: ${pranaStatus}`, pranaDataRef.current, graphX, startY + (graphH + gap) * 2, graphW, graphH, 'rgb(0, 215, 255)', 'fill');
@@ -332,7 +340,7 @@ export default function BioAnalyticsPanel({
             const focusStatus = focusScoreRef.current > 0.6 ? "Sharp" : "Drifting";
             drawGraph(`Focus: ${focusStatus}`, focusDataRef.current, graphX, startY + (graphH + gap) * 3, graphW, graphH, 'rgb(255, 200, 0)', 'beam');
 
-            drawGraph(`HRV Index: ${hrvIndexRef.current} ms`, hrvIndexDataRef.current, graphX, startY + (graphH + gap) * 4, graphW, graphH, 'rgb(200, 255, 200)', 'area');
+            drawGraph(`HRV (RMSSD): ${hrvIndexRef.current} ms`, hrvIndexDataRef.current, graphX, startY + (graphH + gap) * 4, graphW, graphH, 'rgb(255, 255, 255)', 'area');
 
             // --- NADI PARIKSHA (Tiny Graphs) ---
             const tgY = startY + (graphH + gap) * 5 + 15;
