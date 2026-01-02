@@ -6,7 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { buildGeminiPrompt, type AIContext } from '@/utils/ai-coach';
+import { buildGeminiPrompt, type AIContext } from '../../../utils/ai-coach';
 
 const GEMINI_ENDPOINT = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent';
 
