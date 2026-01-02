@@ -33,8 +33,11 @@ A true agent must **Perceive**, **Reason**, and **Act**. Here is how Yoga AI ful
 - **State Awareness**: The Agent remembers your "Session Phase". It won't interrupt your flow unless necessary.
 - **Stress-Responsive**: High Heart Rate + Poor Posture = **"Relaxation Protocol"** (Agent suggests breathwork).
 - **Wisdom Injection**: Uses **Gemini AI** to explain the *spiritual significance* of your current pose, not just the physical alignment.
+<div align="center">
+  <img src="assets/images/vedic_flow.png" width="800" alt="Yoga AI Vedic Tech Flow">
+</div>
 
-### 📊 Bio-Analytics Engine
+# 🧘 YOGA AI: THE VEDIC ADVISOR
 - **Heart & SpO2 Monitoring**: Integrates with hardware sensors to display real-time **Heart Rate (BPM)**.
 - **Energy Coherence Radar**: Visualizes the harmony between your mind and body.
 
@@ -47,15 +50,22 @@ A true agent must **Perceive**, **Reason**, and **Act**. Here is how Yoga AI ful
 
 ---
 
+### 🛸 Antigravity Meditation Concept
+The future of Yoga AI involves immersive, floating environments.
+<div align="center">
+  <img src="assets/images/antigravity_chamber.png" width="600" alt="Antigravity Chamber">
+</div>
+### Arduino Heart Rate Sensor Hardware
+![Arduino Sensor](assets/images/arduino_sensor.png)
+*MAX30100 pulse oximeter sensor with real-time heart rate monitoring*
+
+---
+
 ## 📸 Visual Demonstrations
 
 ### Python Backend UI (AI ChakraFlow Engine)
 ![Python UI Demo](assets/images/python_ui_demo.png)
 *Real-time bio-analytics, chakra energy visualization, and mudra guide with meditation hints*
-
-### Arduino Heart Rate Sensor Hardware
-![Arduino Sensor](assets/images/arduino_sensor.png)
-*MAX30100 pulse oximeter sensor with real-time heart rate monitoring*
 
 ---
 
